@@ -1,7 +1,21 @@
 from typing import List, Tuple
 import matplotlib.pyplot as plt
+import time
 
 Point = Tuple[int, int]
+
+def leer_prueba(numero: int, archivo: str = "pruebas_convex_hull.txt") -> List[Point]:
+    with open(archivo, "r") as f:
+        lineas = f.readlines()
+        if numero < 1 or numero > len(lineas):
+            raise ValueError("Número de prueba fuera de rango")
+        linea = lineas[numero - 1].strip()
+        partes = linea.split("|")[1:]  # ignorar "PruebaX"
+        puntos = []
+        for p in partes:
+            x_str, y_str = p.split(",")
+            puntos.append((float(x_str), float(y_str)))
+        return puntos
 
 def cross(o: Point, a: Point, b: Point) -> int:
     return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
@@ -66,14 +80,23 @@ def plot_convex_hull(points: List[Point], hull: List[Point]) -> None:
     plt.show()
 
 if __name__ == "__main__":
-    pts = [(0, 0), (1, 1), (2, 2), (2, 0), (2, 4), (3, 3), (0, 3)]
+    print("Benchmarking Divide and Conquer:")
+    for i in range(1, 31):
+        puntos = leer_prueba(i)
+        start = time.perf_counter()
+        hull = divide_and_conquer(puntos)
+        end = time.perf_counter()
+        elapsed = end - start
+        print(f"Prueba {i:02d} | Puntos: {len(puntos):3d} | Tiempo: {elapsed:.6f} segundos")
     
-    # Show points before computing the hull
-    plot_points(pts)
+    # pts = [(0, 0), (1, 1), (2, 2), (2, 0), (2, 4), (3, 3), (0, 3)]
     
-    # Compute the convex hull
-    hull = divide_and_conquer(pts)
-    print("Convex Hull (DaC):", hull)
+    # # Show points before computing the hull
+    # plot_points(pts)
     
-    # Show points after adding the convex hull
-    plot_convex_hull(pts, hull)
+    # # Compute the convex hull
+    # hull = divide_and_conquer(pts)
+    # print("Convex Hull (DaC):", hull)
+    
+    # # Show points after adding the convex hull
+    # plot_convex_hull(pts, hull)
